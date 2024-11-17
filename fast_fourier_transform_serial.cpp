@@ -62,6 +62,7 @@ void fft(std::vector<Complex>& X, std::vector<Complex>& Y, int n) {
         std::cout << value << std::endl;
     }
     
+    std::cout << "Number of processes : " << 1 << "\n";
     std::cout << "Time taken (in seconds) : " << std::setprecision(TIME_PRECISION) << time_taken << "\n";
 }
 
