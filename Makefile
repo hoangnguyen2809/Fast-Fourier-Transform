@@ -1,12 +1,13 @@
 CXX = g++
 MPICXX = mpic++
 CXXFLAGS = -std=c++14 -O3 $(MACRO)
+LDFLAGS = -lpthread
 
 COMMON= core/utils.h core/cxxopts.h core/get_time.h 
-SERIAL= longest_common_sequence_serial
-PARALLEL= longest_common_sequence_parallel 
-DISTRIBUTED= longest_common_sequence_distributed
-ALL= $(SERIAL) $(PARALLEL)
+SERIAL= fast_fourier_transform_serial
+PARALLEL= fast_fourier_transform_parallel 
+DISTRIBUTED= fast_fourier_transform_distributed
+ALL= $(SERIAL) $(PARALLEL) $(DISTRIBUTED)
 
 all : $(ALL)
 
@@ -14,7 +15,7 @@ $(SERIAL): %: %.cpp
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 $(PARALLEL): %: %.cpp
-	$(CXX) $(CXXFLAGS) -o $@ $<
+	$(CXX) $(CXXFLAGS) -o $@ $< $(LDFLAGS)
 
 $(DISTRIBUTED): %: %.cpp
 	$(MPICXX) $(CXXFLAGS) -o $@ $<
