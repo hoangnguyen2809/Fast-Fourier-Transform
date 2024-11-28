@@ -65,11 +65,14 @@ void fft(std::vector<Complex>& X, std::vector<Complex>& Y, int n) {
     // print thread_id, processed_points, time_taken
     std::cout << "thread_id, processed_points, time_taken" << std::endl;
     std::cout << "0, " << processed_points << ", " << std::setprecision(TIME_PRECISION) << time_taken << std::endl;
+    std::cout << "Total processed points: " << processed_points << std::endl;
     // Output the results
     std::cout << "FFT Frequency Bins:" << std::endl;
-    int i = 0;
-    for (const auto& value : Y) {
-        std::cout << "FreqBin[" << i++ << "] = " << value << std::endl;
+    int position = 0;
+    int step = n/6;
+    for (int x = 0; x < 6; x++) {
+        std::cout << "FreqBin[" << position << "] = " << Y[position] << std::endl;
+        position += step;
     }
 
     std::cout << "Time taken (in seconds) : " << std::setprecision(TIME_PRECISION) << time_taken << "\n";
