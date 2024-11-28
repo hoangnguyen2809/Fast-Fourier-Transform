@@ -7,6 +7,7 @@ Initializing Sine Wave...
 Computing FFT...
 thread_id, processed_points, time_taken
 0, 64, 1.9073e-06
+FFT Frequency Bins:
 FreqBin[0] = (3.0777,0)
 FreqBin[2] = (-4.923,-2.0392)
 FreqBin[4] = (-0.36327,-0.36327)
@@ -14,3 +15,29 @@ FreqBin[6] = (-0.056776,-0.13707)
 FreqBin[8] = (-2.2204e-16,0)
 FreqBin[10] = (-0.056776,0.13707)
 Time taken (in seconds) : 9.5367e-07
+
+
+
+./fast_fourier_transform_parallel --nThreads 4 --nSamples 16 --freq 5 --rSampling 50
+Sample Size: 16
+Number of threads: 4
+Frequency of the sine wave: 5 Hz
+Sampling rate: 50 Hz
+Initializing Sine Wave...
+Computing FFT...
+thread_id, processed_points, time_taken
+rank, processed_points, time_taken
+0, 36, 0.00035
+1, 20, 0.00030
+2, 12, 0.00029
+3, 12, 0.00026
+FFT Frequency Bins:
+FreqBin[0] = (3.07768,0.00000)
+FreqBin[2] = (-4.92302,-2.03918)
+FreqBin[4] = (-0.36327,-0.36327)
+FreqBin[6] = (-0.05678,-0.13707)
+FreqBin[8] = (-0.00000,0.00000)
+FreqBin[10] = (-0.05678,0.13707)
+Time taken (in seconds) : 0.00035
+FFT output saved to fft_parallel_output.csv
+Run python3 plotting.py <filename> to plot the output
