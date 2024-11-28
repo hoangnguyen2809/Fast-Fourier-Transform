@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <vector>
+#include <fstream>
 
 #define DEFAULT_SAMPLE_SIZE "16"
 #define DEFAULT_FREQUENCY "5"
@@ -75,6 +76,9 @@ void fft(std::vector<Complex>& X, std::vector<Complex>& Y, int n) {
         position += step;
     }
 
+    // for (const auto& value : Y) {
+    //     std::cout << value << std::endl;
+    // }
     std::cout << "Time taken (in seconds) : " << std::setprecision(TIME_PRECISION) << time_taken << "\n";
 }
 
@@ -120,5 +124,17 @@ int main(int argc, char *argv[]) {
     std::cout << "Computing FFT..." << std::endl;
     fft(X, Y, size);
     
+    std::ofstream outputFile("fft_serial_output.csv");
+    outputFile << "Frequency Bin,Magnitude,Phase\n"; // CSV header
+
+    for (size_t i = 0; i < Y.size(); ++i) {
+        double magnitude = std::abs(Y[i]);
+        double phase = std::arg(Y[i]);
+        outputFile << i << "," << magnitude << "," << phase << "\n";
+    }
+
+    outputFile.close();
+    std::cout << "FFT output saved to fft_serial_output.csv\n";
+    std::cout << "Run python3 plotting.py <filename> to plot the output\n";
     return 0;
 }

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <thread>
+#include <fstream>
 
 #define NUM_THREADS 4 
 #define DEFAULT_SAMPLE_SIZE "16"
@@ -90,15 +91,39 @@ void thread_func(ThreadData* data) {
     data->time_taken = thread_timer.stop();
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    // Initialize command line arguments
+    cxxopts::Options options("Fast Fourier Transform Computation",
+                            "Computes the Discrete Fourier Transform (DFT) of a sequence");
+    
+    options.add_options(
+        "custom",
+        {
+        {"nThreads", "Number of threads",
+        cxxopts::value<uint>()->default_value(DEFAULT_NUMBER_OF_THREADS)},
+        {"nSamples", "Number of samples (must be a power of 2 for FFT)",         
+        cxxopts::value<uint>()->default_value(DEFAULT_FREQUENCY)}, 
+        {"freq", "Frequency of the sine wave in Hz",         
+        cxxopts::value<double>()->default_value(DEFAULT_FREQUENCY)},     
+        {"rSampling", "Sampling rate in Hz (samples per second)",
+        cxxopts::value<double>()->default_value(DEFAULT_SAMPLING_RATE)},
+        });
     // ------------------- Initialization -------------------
     // Sample input (size must be a power of 2)
     
     
-    size_t n = 16;                // Number of samples (must be a power of 2 for FFT)
-    double frequency = 5.0;       // Frequency of the sine wave in Hz
-    double samplingRate = 50.0;   // Sampling rate in Hz (samples per second)
+    auto cl_options = options.parse(argc, argv);
+    uint n_threads = cl_options["nThreads"].as<uint>();
+    if (n_threads == 0) {
+        std::cout << "Number of threads cannot be 0. Terminating..." << std::endl;
+        return 1;
+    }
+    uint n = cl_options["nSamples"].as<uint>();
+    double frequency = cl_options["freq"].as<double>();
+    double samplingRate = cl_options["rSampling"].as<double>();
+
     std::vector<Complex> X = generateSineWave(n, frequency, samplingRate);
+    
     n_global = X.size();
     r_global = log2(n_global);
     // Check if n is a power of 2
@@ -106,6 +131,11 @@ int main() {
         std::cerr << "Error: Input size must be a power of 2." << std::endl;
         return -1;
     }
+    std::cout << "Sample Size: " << n << std::endl;
+    std::cout << "Number of threads: " << n_threads << std::endl;
+    std::cout << "Frequency of the sine wave: " << frequency << " Hz" << std::endl;
+    std::cout << "Sampling rate: " << samplingRate << " Hz" << std::endl;
+    std::cout << "Initializing Sine Wave..." << std::endl;
 
     // Initialize global input and output vectors
     X_global = X;
@@ -147,21 +177,40 @@ int main() {
             total_time = thread_data[t].time_taken;
         }
     }
-
+    
     // Output the results
-    std::cout << "Number of processes : " << NUM_THREADS << "\n";
-    std::cout << "rank, processed_points, time_taken" << std::endl;
+    std::cout << "Computing FFT..." << std::endl;
+    std::cout << "thread_id, processed_points, time_taken" << std::endl;
     for (int t = 0; t < NUM_THREADS; ++t) {
         std::cout << t << ", " << thread_data[t].processed_points << ", ";
         std::cout << std::fixed << std::setprecision(TIME_PRECISION) << thread_data[t].time_taken << std::endl;
     }
 
-    std::cout << "FFT result:" << std::endl;
-    for (const auto& value : Y_global) {
-        std::cout << std::fixed << std::setprecision(5) << "(" << value.real() << "," << value.imag() << ")" << std::endl;
+    std::cout << "FFT Frequency Bins:" << std::endl;
+    int position = 0;
+    int step = n/6;
+    for (int x = 0; x < 6; x++) {
+        std::cout << "FreqBin[" << position << "] = " << Y_global[position] << std::endl;
+        position += step;
     }
+    // for (const auto& value : Y_global) {
+    //     std::cout << std::fixed << std::setprecision(5) << "(" << value.real() << "," << value.imag() << ")" << std::endl;
+    // }
 
     std::cout << "Time taken (in seconds) : " << std::fixed << std::setprecision(TIME_PRECISION) << total_time << "\n";
+    std::ofstream outputFile("fft_parallel_output.csv");
+    outputFile << "Frequency Bin,Magnitude,Phase\n"; // CSV header
+
+    for (size_t i = 0; i < Y_global.size(); ++i) {
+        double magnitude = std::abs(Y_global[i]);
+        double phase = std::arg(Y_global[i]);
+        outputFile << i << "," << magnitude << "," << phase << "\n";
+    }
+
+    outputFile.close();
+    std::cout << "FFT output saved to fft_parallel_output.csv\n";
+    std::cout << "Run python3 plotting.py <filename> to plot the output\n";
+    return 0;
 
     return 0;
 }
