@@ -8,6 +8,8 @@
 #include <atomic>
 #include <condition_variable>
 #include <limits.h>
+#include <cmath>
+#include <complex>
 
 #define intV int32_t
 #define uintV int32_t
@@ -16,7 +18,7 @@
 #define intE int32_t
 #define uintE int32_t
 
-#define DEFAULT_NUMBER_OF_WORKERS "1"
+#define DEFAULT_NUMBER_OF_THREADS "1"
 #define DEFAULT_MAX_ITER "20"
 #define TIME_PRECISION 5
 #define VAL_PRECISION 14
@@ -24,6 +26,9 @@
 #define DEFAULT_STRATEGY "1"
 #define DEFAULT_GRANULARITY "1"
 #define ADDITIONAL_TIMER_LOGS 1 
+
+
+using Complex = std::complex<double>;
 
 struct CustomBarrier
 {
@@ -53,5 +58,20 @@ struct CustomBarrier
         //  Condition has been reached. return
     }
 };
+
+std::vector<Complex> generateSineWave(size_t n, double frequency, double samplingRate) {
+    std::vector<Complex>signal(n);
+
+    for (size_t i = 0; i < n; ++i) {
+        // Calculate time at sample i
+        double t = static_cast<double>(i) / samplingRate;
+
+        // Generate the real part as a sine wave, imaginary part is zero
+        double value = sin(2 * M_PI * frequency * t);
+        signal[i] = Complex(value, 0.0);
+    }
+
+    return signal;
+}
 
 #endif

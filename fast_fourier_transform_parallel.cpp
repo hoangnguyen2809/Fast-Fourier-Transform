@@ -1,25 +1,26 @@
 #include "core/utils.h"
-#include <iostream>
-#include <vector>
-#include <complex>
-#include <cmath>
-#include <thread>
 #include <iomanip>
+#include <iostream>
+#include <stdlib.h>
+#include <vector>
+#include <thread>
+
+#define NUM_THREADS 4 
+#define DEFAULT_SAMPLE_SIZE "16"
+#define DEFAULT_FREQUENCY "5.0"
+#define DEFAULT_SAMPLING_RATE "50.0"
 
 // Type alias for complex numbers
 using Complex = std::complex<double>;
 
 // Constants
-#define NUM_THREADS 4
+
 
 // Global variables for input and output
 std::vector<Complex> X_global;   // Input vector
 std::vector<Complex> Y_global;   // Output vector after FFT
 int n_global;                    // Size of the input (must be a power of 2)
 int r_global;                    // Number of bits for indexing
-
-// Barrier for thread synchronization
-CustomBarrier barrier(NUM_THREADS);
 
 // Function to reverse the bits of an index
 int reverseBits(int x, int numBits) {
@@ -54,14 +55,8 @@ void thread_func(ThreadData* data) {
     // ------------------- Bit-Reversal Step -------------------
     for (int i = data->rank; i < data->n; i += data->num_threads) {
         int revIndex = reverseBits(i, data->r);
-        if (revIndex != i) {
-            (*data->Y)[revIndex] = (*data->X)[i];
-            data->processed_points += 1;
-        } else {
-            // Handle the case when revIndex == i
-            (*data->Y)[i] = (*data->X)[i];
-            data->processed_points += 1;
-        }
+        (*data->Y)[revIndex] = (*data->X)[i];
+        data->processed_points += 1;
     }
 
     // Synchronize all threads after bit-reversal
@@ -72,17 +67,18 @@ void thread_func(ThreadData* data) {
         int step = 1 << m; // 2^m
         Complex w_m = std::exp(Complex(0, -2.0 * M_PI / step)); // Twiddle factor
 
-        // Each thread processes a subset of k's
-        for (int k = data->rank * (data->n / data->num_threads); k < data->n; k += data->num_threads * (data->n / data->num_threads)) {
+        for (int k = 0; k < data->n; k += step) {
+            // Assign k indices to threads using modulo operation
+            if (((k / step) % data->num_threads) != data->rank) continue;
+
+            Complex w = 1;
             for (int j = 0; j < step / 2; ++j) {
-                if (k + j + step / 2 < data->n) {
-                    Complex w = std::pow(w_m, j); // Compute twiddle factor for this j
-                    Complex t = w * (*data->Y)[k + j + step / 2];
-                    Complex u = (*data->Y)[k + j];
-                    (*data->Y)[k + j] = u + t;
-                    (*data->Y)[k + j + step / 2] = u - t;
-                    data->processed_points += 2; // Two operations per butterfly
-                }
+                Complex t = w * (*data->Y)[k + j + step / 2];
+                Complex u = (*data->Y)[k + j];
+                (*data->Y)[k + j] = u + t;
+                (*data->Y)[k + j + step / 2] = u - t;
+                w *= w_m;
+                data->processed_points += 2; // Two operations per butterfly
             }
         }
 
@@ -97,10 +93,14 @@ void thread_func(ThreadData* data) {
 int main() {
     // ------------------- Initialization -------------------
     // Sample input (size must be a power of 2)
-    std::vector<Complex> X = { 1, 2, 3, 4 };
+    
+    
+    size_t n = 16;                // Number of samples (must be a power of 2 for FFT)
+    double frequency = 5.0;       // Frequency of the sine wave in Hz
+    double samplingRate = 50.0;   // Sampling rate in Hz (samples per second)
+    std::vector<Complex> X = generateSineWave(n, frequency, samplingRate);
     n_global = X.size();
     r_global = log2(n_global);
-
     // Check if n is a power of 2
     if ((1 << r_global) != n_global) {
         std::cerr << "Error: Input size must be a power of 2." << std::endl;
@@ -111,12 +111,12 @@ int main() {
     X_global = X;
     Y_global.resize(n_global);
 
+    // Initialize the barrier for thread synchronization
+    CustomBarrier barrier(NUM_THREADS);
+
     // ------------------- Thread Creation -------------------
     std::thread threads[NUM_THREADS];
     ThreadData thread_data[NUM_THREADS];
-
-    // Initialize the barrier for thread synchronization
-    CustomBarrier barrier(NUM_THREADS);
 
     // Create threads and assign work
     for (int t = 0; t < NUM_THREADS; ++t) {
@@ -158,7 +158,7 @@ int main() {
 
     std::cout << "FFT result:" << std::endl;
     for (const auto& value : Y_global) {
-        std::cout << value << std::endl;
+        std::cout << std::fixed << std::setprecision(5) << "(" << value.real() << "," << value.imag() << ")" << std::endl;
     }
 
     std::cout << "Time taken (in seconds) : " << std::fixed << std::setprecision(TIME_PRECISION) << total_time << "\n";
