@@ -8,7 +8,7 @@
 -  freq: frequency of the sine wave
 -  rSampling: sample rate
 
-### To run serial version: ./fast_fourier_transform_serial --nThreads 1 --nSamples <sample_size> --freq <frequency> --rSampling <sample_rate>
-### To run parallel version: ./fast_fourier_transform_serial --nThreads <number_of_processes> --nSamples <sample_size> --freq <frequency> --rSampling <sample_rate>
-### To run MPI version: mpirun -n <number_of_processes> ./fast_fourier_transform_serial --nSamples <sample_size> --freq <frequency> --rSampling <sample_rate>
+### To run serial version: `./fast_fourier_transform_serial --nThreads 1 --nSamples <sample_size> --freq <frequency> --rSampling <sample_rate>`
+### To run parallel version: `./fast_fourier_transform_serial --nThreads <number_of_processes> --nSamples <sample_size> --freq <frequency> --rSampling <sample_rate>`
+### To run MPI version: `mpirun -n <number_of_processes> ./fast_fourier_transform_serial --nSamples <sample_size> --freq <frequency> --rSampling <sample_rate>`
 
