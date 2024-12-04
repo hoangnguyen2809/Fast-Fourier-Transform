@@ -6,7 +6,6 @@
 #include <thread>
 #include <fstream>
 
-#define NUM_THREADS 4 
 #define DEFAULT_SAMPLE_SIZE "16"
 #define DEFAULT_FREQUENCY "5.0"
 #define DEFAULT_SAMPLING_RATE "50.0"
@@ -142,16 +141,16 @@ int main(int argc, char *argv[]) {
     Y_global.resize(n_global);
 
     // Initialize the barrier for thread synchronization
-    CustomBarrier barrier(NUM_THREADS);
+    CustomBarrier barrier(n_threads);
 
     // ------------------- Thread Creation -------------------
-    std::thread threads[NUM_THREADS];
-    ThreadData thread_data[NUM_THREADS];
+    std::thread threads[n_threads];
+    ThreadData thread_data[n_threads];
 
     // Create threads and assign work
-    for (int t = 0; t < NUM_THREADS; ++t) {
+    for (int t = 0; t < n_threads; ++t) {
         thread_data[t].rank = t;
-        thread_data[t].num_threads = NUM_THREADS;
+        thread_data[t].num_threads = n_threads;
         thread_data[t].X = &X_global;
         thread_data[t].Y = &Y_global;
         thread_data[t].n = n_global;
@@ -165,14 +164,14 @@ int main(int argc, char *argv[]) {
 
     // ------------------- Thread Joining -------------------
     // Wait for all threads to complete
-    for (int t = 0; t < NUM_THREADS; ++t) {
+    for (int t = 0; t < n_threads; ++t) {
         threads[t].join();
     }
 
     // ------------------- Timing and Output -------------------
     // Compute the total time taken (maximum time among all threads)
     double total_time = 0.0;
-    for (int t = 0; t < NUM_THREADS; ++t) {
+    for (int t = 0; t < n_threads; ++t) {
         if (thread_data[t].time_taken > total_time) {
             total_time = thread_data[t].time_taken;
         }
@@ -181,7 +180,7 @@ int main(int argc, char *argv[]) {
     // Output the results
     std::cout << "Computing FFT..." << std::endl;
     std::cout << "thread_id, processed_points, time_taken" << std::endl;
-    for (int t = 0; t < NUM_THREADS; ++t) {
+    for (int t = 0; t < n_threads; ++t) {
         std::cout << t << ", " << thread_data[t].processed_points << ", ";
         std::cout << std::fixed << std::setprecision(TIME_PRECISION) << thread_data[t].time_taken << std::endl;
     }
