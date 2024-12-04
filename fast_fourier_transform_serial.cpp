@@ -12,7 +12,7 @@
 // Type alias for complex numbers
 using Complex = std::complex<double>;
 
-// reverse bits of an index
+//  reverses the bits of the index x (where numBits is the number of bits needed to represent the index of the array)
 int reverseBits(int x, int numBits) {
     int reversed = 0;
     for (int i = 0; i < numBits; ++i) {
