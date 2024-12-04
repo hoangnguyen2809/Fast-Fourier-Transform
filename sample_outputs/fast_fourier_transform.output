@@ -1,3 +1,9 @@
+./fast_fourier_transform_serial --nThreads 1 --nSamples 1048576 --freq 5 --rSampling 50
+./fast_fourier_transform_parallel --nThreads 4 --nSamples 1048576 --freq 5 --rSampling 50
+mpirun -n 4 ./fast_fourier_transform_distributed --nSamples 1048576 --freq 5 --rSampling 50
+
+
+
 ./fast_fourier_transform_serial --nThreads 1 --nSamples 16 --freq 5 --rSampling 50
 Sample Size : 16
 Number of threads : 1
