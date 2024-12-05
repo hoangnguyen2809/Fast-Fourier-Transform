@@ -197,18 +197,18 @@ int main(int argc, char *argv[]) {
     // }
 
     std::cout << "Time taken (in seconds) : " << std::fixed << std::setprecision(TIME_PRECISION) << total_time << "\n";
-    std::ofstream outputFile("fft_parallel_output.csv");
-    outputFile << "Frequency Bin,Magnitude,Phase\n"; // CSV header
+    // std::ofstream outputFile("fft_parallel_output.csv");
+    // outputFile << "Frequency Bin,Magnitude,Phase\n"; // CSV header
 
-    for (size_t i = 0; i < Y_global.size(); ++i) {
-        double magnitude = std::abs(Y_global[i]);
-        double phase = std::arg(Y_global[i]);
-        outputFile << i << "," << magnitude << "," << phase << "\n";
-    }
+    // for (size_t i = 0; i < Y_global.size(); ++i) {
+    //     double magnitude = std::abs(Y_global[i]);
+    //     double phase = std::arg(Y_global[i]);
+    //     outputFile << i << "," << magnitude << "," << phase << "\n";
+    // }
 
-    outputFile.close();
-    std::cout << "FFT output saved to fft_parallel_output.csv\n";
-    std::cout << "Run python3 plotting.py <filename> to plot the output\n";
+    // outputFile.close();
+    // std::cout << "FFT output saved to fft_parallel_output.csv\n";
+    // std::cout << "Run python3 plotting.py <filename> to plot the output\n";
     return 0;
 
     return 0;

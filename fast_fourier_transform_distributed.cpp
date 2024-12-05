@@ -188,20 +188,20 @@ int main(int argc, char *argv[]) {
     }
 
     // Output to CSV from rank 0
-    if (rank == 0) {
-        std::ofstream outputFile("fft_distributed_output.csv");
-        outputFile << "Frequency Bin,Magnitude,Phase\n"; // CSV header
+    // if (rank == 0) {
+    //     std::ofstream outputFile("fft_distributed_output.csv");
+    //     outputFile << "Frequency Bin,Magnitude,Phase\n"; // CSV header
 
-        for (size_t i = 0; i < Y.size(); ++i) {
-            double magnitude = std::abs(Y[i]);
-            double phase = std::arg(Y[i]);
-            outputFile << i << "," << magnitude << "," << phase << "\n";
-        }
+    //     for (size_t i = 0; i < Y.size(); ++i) {
+    //         double magnitude = std::abs(Y[i]);
+    //         double phase = std::arg(Y[i]);
+    //         outputFile << i << "," << magnitude << "," << phase << "\n";
+    //     }
 
-        outputFile.close();
-        std::cout << "FFT output saved to fft_distributed_output.csv\n";
-        std::cout << "Run python3 plotting.py <filename> to plot the output\n";
-    }
+    //     outputFile.close();
+    //     std::cout << "FFT output saved to fft_distributed_output.csv\n";
+    //     std::cout << "Run python3 plotting.py <filename> to plot the output\n";
+    // }
 
     MPI_Finalize();
     return 0;
