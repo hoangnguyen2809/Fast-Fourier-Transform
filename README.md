@@ -6,11 +6,12 @@ A C++ implementation of the Fast Fourier Transform (FFT) algorithm, featuring **
 - Use `make`
 
 ## Usage
-Parameter | Description | Requirement
---nThreads | Number of threads/processes to use | ≥ 1 (ignored in MPI mode)
---nSamples | Sample size used for FFT | Must be a power of 2
---freq | Frequency of the sine wave | Float (e.g., 50.0)
---rSampling | Sampling rate | Float (e.g., 1000.0)
+| Parameter   | Description                        | Requirement                |   |   |
+|-------------|------------------------------------|----------------------------|---|---|
+| --nThreads  | Number of threads/processes to use | >= 1 (ignored in MPI mode) |   |   |
+| --Samples   | Sample size used for FFT           | Must be power of 2         |   |   |
+| --freq      | Frequency of sine wave             | Float (e.g., 50.0)         |   |   |
+| --rSampling | Sampling rate                      | Float (e.g., 1000.0)       |   |   |
 
 1. Serial version:
    `./fast_fourier_transform_serial --nThreads 1 --nSamples <sample_size> --freq <frequency> --rSampling <sample_rate>`
